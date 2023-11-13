@@ -21,10 +21,10 @@ data_points = deque(maxlen=150)
 fig, ax = plt.subplots() 
 plt_lines, = ax.plot([0], [30], "b") 
 ax.set_xlim(0, 101) 
-ax.set_ylim(0, 1) 
+ax.set_ylim(0, 1000) 
 
 class FFA:
-    def __init__(self, lb = -1, ub = 1, dim = 4, poblacion=20, alpha=0.5, betamin=1.0, gamma=0.001, seed=None):
+    def __init__(self, lb = -1, ub = 1, dim = 4, poblacion=20, alpha=0.5, betamin=1.0, gamma=0.001, seed=None, FO = func):
         self.poblacion = poblacion
         self.alpha = alpha
         self.betamin = betamin
@@ -34,17 +34,18 @@ class FFA:
         self.dim = dim
         self.rng = default_rng(seed)
         self.ffs = []
+        self.FO = FO
 
     def handleRemove(f, id):
         return f.id == id
     
-    def create_poblation(self, data):
+    def create_poblation(self, data, max_tol = 0.00001, max_kill_count=5):
         lists = self.rng.uniform(self.lb, self.ub, (self.poblacion, self.dim))
         for l in lists:
-            self.ffs.append(FF(attr = copy.deepcopy(l), data = copy.deepcopy(data), FO=func, max_tol=0.00001, max_kill_count = 2))
+            self.ffs.append(FF(attr = copy.deepcopy(l), data = copy.deepcopy(data), FO=self.FO, max_tol=max_tol, max_kill_count = max_kill_count))
         
 
-    def emulate(self, max_eval):
+    def emulate(self, max_eval, least_value= 0.00001):
 
         evaluations = 0
         new_alpha = copy.deepcopy(self.alpha)
@@ -78,8 +79,8 @@ class FFA:
             if len(result_list) == 0:
                 print("murieron todos")
                 break
-            if get_last_value(result_list[0]) < 0.00001:
-                print("existe menor que 0.00001")
+            if get_last_value(result_list[0]) <= least_value :
+                print("existe menor que ", least_value)
                 data_points.append((evaluations, result_list[0].last_value))
                 plt_x_values = [x for x, y in data_points] 
                 plt_y_values = [y for x, y in data_points] 
@@ -93,7 +94,7 @@ class FFA:
                     # print("no se puede replicar porque no existen suficientes ejemplares")
                     break
                 else:
-                    new_FF = result_list[0].replicate(attr=copy.deepcopy(result_list[1].getAttr()), data= copy.deepcopy(result_list[0].data), func = func)
+                    new_FF = result_list[0].replicate(attr=copy.deepcopy(result_list[1].getAttr()), data= copy.deepcopy(result_list[0].data), func = self.FO)
                     # print("se replica un ejemplar con atributos: ", new_FF.getAttr())
                     self.ffs.append(new_FF)
                 die_count -= 1
