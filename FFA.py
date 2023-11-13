@@ -4,7 +4,12 @@ import numpy as np
 from numpy.random import default_rng
 
 def func(a = [], data = []):
-    return (1.0 - max(0, (a[0]*data[0] + a[1]*data[1] + a[2]*data[2] + a[3]))) ** 2
+    neu1 = max(0, (a[0]*data[0] + a[1]*data[1] + a[2]))
+    neu2 = max(0, (a[3]*data[0] + a[4]*data[1] + a[5]))
+    neu3 = max(0, (a[6]*neu1 + a[7]*neu2 + a[8]))
+    neu4 = max(0, (a[9]*neu1 + a[10]*neu2 + a[11]))
+    neu_fin = max(0, (a[12]*neu3 + a[13]*neu4 + a[14]))
+    return (49.0 - neu_fin) ** 2
     
 
 def get_last_value(f):
@@ -28,7 +33,7 @@ class FFA:
     def create_poblation(self, data):
         lists = self.rng.uniform(self.lb, self.ub, (self.poblacion, self.dim))
         for l in lists:
-            self.ffs.append(FF(attr = copy.deepcopy(l), data = copy.deepcopy(data), FO=func, max_tol=0.0000001, max_kill_count = 2))
+            self.ffs.append(FF(attr = copy.deepcopy(l), data = copy.deepcopy(data), FO=func, max_tol=0.00001, max_kill_count = 2))
         
 
     def emulate(self, max_eval):
@@ -57,7 +62,7 @@ class FFA:
                 f.compute()
                 if f.isDead():
                     self.ffs.pop(index_f)
-                    print("something dies with attr: ", f.getAttr())
+                    # print("something dies with attr: ", f.getAttr())
                     die_count += 1
             evaluations += 1
             result_list = copy.deepcopy(self.ffs)
@@ -65,22 +70,23 @@ class FFA:
             if len(result_list) == 0:
                 print("murieron todos")
                 break
-            if get_last_value(result_list[0]) < 0.0000001:
-                print("existe menor que 0.0000001")
+            if get_last_value(result_list[0]) < 0.00001:
+                # print("existe menor que 0.00001")
                 break
             while die_count > 0:
                 print("intentan replicarse")
                 if len(result_list) < 2:
-                    print("no se puede replicar porque no existen suficientes ejemplares")
+                    # print("no se puede replicar porque no existen suficientes ejemplares")
                     break
                 else:
                     new_FF = result_list[0].replicate(attr=copy.deepcopy(result_list[1].getAttr()), data= copy.deepcopy(result_list[0].data), func = func)
-                    print("se replica un ejemplar con atributos: ", new_FF.getAttr())
+                    # print("se replica un ejemplar con atributos: ", new_FF.getAttr())
                     self.ffs.append(new_FF)
                 die_count -= 1
 
         if len(result_list) == 0:
             print("no hay nadie vivo")
         else:
-            for (index_f,f) in enumerate(result_list):
-                print(index_f, "tiene ", f.last_value, "de valor")
+            # for (index_f,f) in enumerate(result_list):
+            #     print(index_f, "tiene ", f.last_value, "de valor")
+            print(result_list[0].getAttr(), "tiene ", result_list[0].last_value, "de valor")
