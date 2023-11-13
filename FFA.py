@@ -28,15 +28,16 @@ class FFA:
     def create_poblation(self, data):
         lists = self.rng.uniform(self.lb, self.ub, (self.poblacion, self.dim))
         for l in lists:
-            self.ffs.append(FF(attr = copy.deepcopy(l), data = copy.deepcopy(data), FO=func, max_tol=0.2, max_kill_count = 2))
+            self.ffs.append(FF(attr = copy.deepcopy(l), data = copy.deepcopy(data), FO=func, max_tol=0.0000001, max_kill_count = 2))
         
 
     def emulate(self, max_eval):
 
         evaluations = 0
-        poblation = copy.deepcopy(self.poblacion)
         new_alpha = copy.deepcopy(self.alpha)
-        search_range = self.ub - self.lb        
+        search_range = self.ub - self.lb   
+        die_count = 0
+
 
         while evaluations <= max_eval:
             print("---------------- eval ", evaluations, " ---------------" )
@@ -57,16 +58,26 @@ class FFA:
                 if f.isDead():
                     self.ffs.pop(index_f)
                     print("something dies with attr: ", f.getAttr())
-
+                    die_count += 1
             evaluations += 1
             result_list = copy.deepcopy(self.ffs)
             result_list.sort(key=get_last_value)
             if len(result_list) == 0:
                 print("murieron todos")
                 break
-            if get_last_value(result_list[0]) < 0.00001:
-                print("existe menor que 0.00001")
+            if get_last_value(result_list[0]) < 0.0000001:
+                print("existe menor que 0.0000001")
                 break
+            while die_count > 0:
+                print("intentan replicarse")
+                if len(result_list) < 2:
+                    print("no se puede replicar porque no existen suficientes ejemplares")
+                    break
+                else:
+                    new_FF = result_list[0].replicate(attr=copy.deepcopy(result_list[1].getAttr()), data= copy.deepcopy(result_list[0].data), func = func)
+                    print("se replica un ejemplar con atributos: ", new_FF.getAttr())
+                    self.ffs.append(new_FF)
+                die_count -= 1
 
         if len(result_list) == 0:
             print("no hay nadie vivo")
