@@ -24,7 +24,7 @@ ax.set_xlim(0, 101)
 ax.set_ylim(0, 1) 
 
 class FFA:
-    def __init__(self, lb = -1, ub = 1, dim = 4, poblacion=20, alpha=1.0, betamin=1.0, gamma=0.001, seed=None):
+    def __init__(self, lb = -1, ub = 1, dim = 4, poblacion=20, alpha=0.5, betamin=1.0, gamma=0.001, seed=None):
         self.poblacion = poblacion
         self.alpha = alpha
         self.betamin = betamin
