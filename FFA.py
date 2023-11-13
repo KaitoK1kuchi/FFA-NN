@@ -56,11 +56,14 @@ class FFA:
                 f.compute()
                 if f.isDead():
                     self.ffs.pop(index_f)
-                    print("something dies with attr: " + f.getAttr)
+                    print("something dies with attr: ", f.getAttr())
 
             evaluations += 1
             result_list = copy.deepcopy(self.ffs)
             result_list.sort(key=get_last_value)
+            if len(result_list) <= 0:
+                print("murieron todos")
+                break
             if get_last_value(result_list[0]) < 0.00001:
                 print("existe menor que 0.00001")
                 break
