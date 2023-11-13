@@ -89,4 +89,4 @@ class FFA:
         else:
             # for (index_f,f) in enumerate(result_list):
             #     print(index_f, "tiene ", f.last_value, "de valor")
-            print(result_list[0].getAttr(), "tiene ", result_list[0].last_value, "de valor")
+            print(result_list[0].getAttr(), "tiene ", result_list[0].last_value, "de error")
