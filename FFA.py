@@ -2,8 +2,6 @@ from FF import FF
 import copy
 import numpy as np
 from numpy.random import default_rng
-import matplotlib.pyplot as plt 
-from collections import deque 
 
 def func(a = [], data = []):
     neu1 = max(0, (a[0]*data[0] + a[1]*data[1] + a[2]))
@@ -15,13 +13,7 @@ def func(a = [], data = []):
     
 
 def get_last_value(f):
-        return f.last_value
-
-data_points = deque(maxlen=150)
-fig, ax = plt.subplots() 
-plt_lines, = ax.plot([0], [30], "b") 
-ax.set_xlim(0, 101) 
-ax.set_ylim(0, 1000) 
+        return f.last_value 
 
 class FFA:
     def __init__(self, lb = -1, ub = 1, dim = 4, poblacion=20, alpha=0.5, betamin=1.0, gamma=0.001, seed=None, FO = func):
@@ -45,7 +37,7 @@ class FFA:
             self.ffs.append(FF(attr = copy.deepcopy(l), data = copy.deepcopy(data), FO=self.FO, max_tol=max_tol, max_kill_count = max_kill_count))
         
 
-    def emulate(self, max_eval, least_value= 0.00001):
+    def emulate(self, data_points, plt_lines, plt, max_eval, least_value= 0.00001 ):
 
         evaluations = 0
         new_alpha = copy.deepcopy(self.alpha)
@@ -98,12 +90,13 @@ class FFA:
                     # print("se replica un ejemplar con atributos: ", new_FF.getAttr())
                     self.ffs.append(new_FF)
                 die_count -= 1
-                data_points.append((evaluations, result_list[0].last_value))
-                plt_x_values = [x for x, y in data_points] 
-                plt_y_values = [y for x, y in data_points] 
-                plt_lines.set_xdata(plt_x_values)
-                plt_lines.set_ydata(plt_y_values)
-                plt.pause(0.001)
+            result_list.sort(key=get_last_value)
+            data_points.append((evaluations, result_list[0].last_value))
+            plt_x_values = [x for x, y in data_points] 
+            plt_y_values = [y for x, y in data_points] 
+            plt_lines.set_xdata(plt_x_values)
+            plt_lines.set_ydata(plt_y_values)
+            plt.pause(0.1)
 
         if len(result_list) == 0:
             print("no hay nadie vivo")
