@@ -3,17 +3,28 @@ import copy
 import numpy as np
 from numpy.random import default_rng
 
-def func(a = [], data = []):
-    neu1 = max(0, (a[0]*data[0] + a[1]*data[1] + a[2]))
-    neu2 = max(0, (a[3]*data[0] + a[4]*data[1] + a[5]))
-    neu3 = max(0, (a[6]*neu1 + a[7]*neu2 + a[8]))
-    neu4 = max(0, (a[9]*neu1 + a[10]*neu2 + a[11]))
-    neu_fin = max(0, (a[12]*neu3 + a[13]*neu4 + a[14]))
-    return (49.0 - neu_fin) ** 2
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def func(a = [], data = [], results=[]):
+    mae = 0
+    for i in range(len(data)-1):
+        # neu1 = sigmoid((a[0]*data[i][0] + a[1]*data[i][1] + a[2]))
+        # neu2 = sigmoid((a[3]*data[i][0] + a[4]*data[i][1] + a[5]))
+        # neu3 = sigmoid((a[6]*neu1 + a[7]*neu2 + a[8]))
+        # neu4 = sigmoid((a[9]*neu1 + a[10]*neu2 + a[11]))
+        # neu_fin = sigmoid((a[12]*neu3 + a[13]*neu4 + a[14]))
+        neu1 = sigmoid((a[0]*data[i][0] + a[1]*data[i][1]))
+        neu2 = sigmoid((a[2]*data[i][0] + a[3]*data[i][1]))
+        neu3 = sigmoid((a[4]*neu1 + a[5]*neu2))
+        neu4 = sigmoid((a[6]*neu1 + a[7]*neu2))
+        neu_fin = sigmoid((a[8]*neu3 + a[9]*neu4))
+        mae += (results[i] - neu_fin)**2
+    return mae/len(data)
     
 
 def get_last_value(f):
-        return f.last_value 
+        return f.last_value
 
 class FFA:
     def __init__(self, lb = -1, ub = 1, dim = 4, poblacion=20, alpha=0.5, betamin=1.0, gamma=0.001, seed=None, FO = func):
@@ -31,10 +42,11 @@ class FFA:
     def handleRemove(f, id):
         return f.id == id
     
-    def create_poblation(self, data, max_tol = 0.00001, max_kill_count=5):
-        lists = self.rng.uniform(self.lb, self.ub, (self.poblacion, self.dim))
+    def create_poblation(self, data, results, max_tol = 0.00001, max_kill_count=5):
+        lists = np.random.normal(scale=0.5, size=(self.poblacion, self.dim))   
+        # lists = self.rng.uniform(self.lb, self.ub, (self.poblacion, self.dim))
         for l in lists:
-            self.ffs.append(FF(attr = copy.deepcopy(l), data = copy.deepcopy(data), FO=self.FO, max_tol=max_tol, max_kill_count = max_kill_count))
+            self.ffs.append(FF(attr = copy.deepcopy(l), data = copy.deepcopy(data), results=copy.deepcopy(results), FO=self.FO, max_tol=max_tol, max_kill_count = max_kill_count))
         
 
     def emulate(self, data_points, plt_lines, plt, max_eval, least_value= 0.00001 ):
@@ -86,7 +98,7 @@ class FFA:
                     # print("no se puede replicar porque no existen suficientes ejemplares")
                     break
                 else:
-                    new_FF = result_list[0].replicate(attr=copy.deepcopy(result_list[1].getAttr()), data= copy.deepcopy(result_list[0].data), func = self.FO)
+                    new_FF = result_list[0].replicate(attr=copy.deepcopy(result_list[1].getAttr()), data= copy.deepcopy(result_list[0].data), results= result_list[0].results, func = self.FO)
                     # print("se replica un ejemplar con atributos: ", new_FF.getAttr())
                     self.ffs.append(new_FF)
                 die_count -= 1
@@ -96,7 +108,6 @@ class FFA:
             plt_y_values = [y for x, y in data_points] 
             plt_lines.set_xdata(plt_x_values)
             plt_lines.set_ydata(plt_y_values)
-            plt.pause(0.1)
 
         if len(result_list) == 0:
             print("no hay nadie vivo")
@@ -105,4 +116,3 @@ class FFA:
             #     print(index_f, "tiene ", f.last_value, "de valor")
             print(result_list[0].getAttr(), "tiene ", result_list[0].last_value, "de error")
         
-        plt.show()
