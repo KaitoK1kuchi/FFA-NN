@@ -12,19 +12,15 @@ def doCalculate(datas, targets, plt):
 
     # y = pd.get_dummies(y).values
 
-    
-
-    print(X, y)
-
     learning_rate = 0.01
     iterations = 200
     N = y.size
 
     # number of input features
-    input_size = 2
+    input_size = 50
 
     # number of hidden layers neurons
-    hidden_size = 2 
+    hidden_size = 100
 
     # number of neurons at the output layer
     output_size = 1  

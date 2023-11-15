@@ -21,7 +21,6 @@ def func(a = [], data = [], results=[]):
         neu_fin = sigmoid((a[8]*neu3 + a[9]*neu4))
         mae += (results[i] - neu_fin)**2
     return mae/len(data)
-    
 
 def get_last_value(f):
         return f.last_value
@@ -46,8 +45,10 @@ class FFA:
         lists = np.random.normal(scale=0.5, size=(self.poblacion, self.dim))   
         # lists = self.rng.uniform(self.lb, self.ub, (self.poblacion, self.dim))
         for l in lists:
+            print("----------------------------")
+            print(data)
             self.ffs.append(FF(attr = copy.deepcopy(l), data = copy.deepcopy(data), results=copy.deepcopy(results), FO=self.FO, max_tol=max_tol, max_kill_count = max_kill_count))
-        
+
 
     def emulate(self, data_points, plt_lines, plt, max_eval, least_value= 0.00001 ):
 
