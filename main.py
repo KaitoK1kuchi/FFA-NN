@@ -1,5 +1,6 @@
 from FFA import FFA
 from BP import doCalculate
+from DpG import DpG
 import math
 import copy
 import numpy as np
@@ -37,9 +38,12 @@ def funchc(X=[], data=[], res = []):
 # values = np.random.normal(scale=0.5, size=(1, 5100))[0]
 # funchc(X=values, data=datalist, res=resultset[0])
 
-ffa = FFA(dim=50, alpha=1, poblacion=20, gamma=0.001, FO=Rastringin)
-ffa.create_poblation(data=datalist, results=resultset[0], max_tol= 0.000000005, max_kill_count=10)
-ffa.emulate(max_eval= 500, least_value=0.000000001, data_points=data_points, plt_lines=plt_lines, plt=plt)
+# ffa = FFA(dim=50, alpha=1, poblacion=20, gamma=0.001, FO=Rastringin, seed=1)
+# ffa.create_poblation(data=datalist, results=resultset[0], max_tol= 0.000000005, max_kill_count=10)
+# ffa.emulate(max_eval= 500, least_value=0.000000001, data_points=data_points, plt_lines=plt_lines, plt=plt)
 
 # doCalculate(datalist, resultset, plt=plt)
+
+dpg = DpG(seed=1, FO=Rastringin, dim=50)
+dpg.run(learning_rate=0.001, results = resultset[0])
 plt.show()
