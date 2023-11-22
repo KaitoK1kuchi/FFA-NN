@@ -45,8 +45,6 @@ class FFA:
         lists = np.random.normal(scale=0.5, size=(self.poblacion, self.dim))   
         # lists = self.rng.uniform(self.lb, self.ub, (self.poblacion, self.dim))
         for l in lists:
-            print("----------------------------")
-            print(data)
             self.ffs.append(FF(attr = copy.deepcopy(l), data = copy.deepcopy(data), results=copy.deepcopy(results), FO=self.FO, max_tol=max_tol, max_kill_count = max_kill_count))
 
 
